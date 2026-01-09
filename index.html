@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TESSALLURE | Luxury Event Curation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <style>
+        :root {
+            --gold: #C5A059;
+            --dark: #121212;
+            --white: #FFFFFF;
+            --cream: #F4F1EA;
+            --transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Montserrat', sans-serif; color: var(--dark); background: var(--white); overflow-x: hidden; }
+
+        h1, h2, h3, .logo-text { font-family: 'Tenor Sans', sans-serif; text-transform: uppercase; letter-spacing: 4px; font-weight: 400; }
+
+        /* NAVIGATION */
+        nav {
+            position: fixed; width: 100%; padding: 25px 5%;
+            display: flex; justify-content: space-between; align-items: center;
+            background:#ffff; backdrop-filter: blur(10px); z-index: 2000;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .nav-links { display: flex; list-style: none; align-items: center; }
+        .nav-links li { margin-left: 35px; }
+        .nav-links a { text-decoration: none; color: var(--dark); font-size: 0.75rem; font-weight: 600; letter-spacing: 1px; transition: 0.3s; }
+        .nav-links a:hover { color: var(--gold); }
+
+        .burger { display: none; cursor: pointer; flex-direction: column; gap: 6px; }
+        .burger div { width: 28px; height: 1px; background: var(--dark); transition: 0.3s; }
+
+        .burger.toggle .line1 { transform: rotate(-45deg) translate(-5px, 6px); }
+        .burger.toggle .line2 { opacity: 0; }
+        .burger.toggle .line3 { transform: rotate(45deg) translate(-5px, -6px); }
+
+        /* HERO SLIDER */
+        .hero-slider {
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .hero-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+        }
+
+        .hero-slide.active { opacity: 1; }
+
+        .hero-slide::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(18, 18, 18, 0.65);
+            z-index: 1;
+        }
+
+        .hero-slide-content {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+            padding: 0 20px;
+        }
+
+        .hero-slide h1 {
+            font-size: clamp(3rem, 10vw, 7rem);
+            margin-bottom: 20px;
+            line-height: 1.1;
+            animation: slideInDown 0.8s ease-out;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .hero-slide p {
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            letter-spacing: 3px;
+            margin-bottom: 40px;
+            font-weight: 300;
+            animation: slideInUp 0.8s ease-out 0.2s both;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-slide .btn-gold {
+            animation: slideInUp 0.8s ease-out 0.4s both;
+        }
+
+        @keyframes slideInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-controls {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        .hero-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid white;
+        }
+
+        .hero-dot.active {
+            background: var(--gold);
+            transform: scale(1.3);
+        }
+
+        .hero-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid white;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .hero-arrow:hover {
+            background: var(--gold);
+            border-color: var(--gold);
+        }
+
+        .hero-arrow.prev { left: 30px; }
+        .hero-arrow.next { right: 30px; }
+
+        /* ANIMATIONS */
+        .reveal { opacity: 0; transform: translateY(50px); transition: var(--transition); }
+        .reveal-left { opacity: 0; transform: translateX(-80px); transition: var(--transition); }
+        .reveal-right { opacity: 0; transform: translateX(80px); transition: var(--transition); }
+        .active { opacity: 1; transform: translate(0); }
+
+        /* SECTIONS */
+        section { padding: 140px 10%; position: relative; overflow: hidden; }
+        .section-tag { color: var(--gold); font-size: 0.75rem; letter-spacing: 5px; margin-bottom: 15px; display: block; text-align: center; font-weight: 600; }
+        .section-title { text-align: center; margin-bottom: 80px; font-size: 2.8rem; line-height: 1.2; }
+
+        /* BUTTONS */
+        .btn-gold { 
+            padding: 18px 45px; border: 1px solid white; color: white; 
+            text-decoration: none; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 3px; transition: 0.4s;
+            display: inline-block; margin-top: 20px; cursor: pointer;
+        }
+        .btn-gold:hover { background: var(--gold); border-color: var(--gold); color: white; transform: translateY(-3px); }
+
+        /* SERVICES */
+        .service-row { display: flex; gap: 80px; align-items: center; margin-bottom: 120px; }
+        .service-row:nth-child(even) { flex-direction: row-reverse; }
+        .service-img-wrapper { flex: 1.2; overflow: hidden; height: 600px; position: relative; }
+        .service-img { width: 100%; height: 100%; background-size: cover; background-position: center; transition: transform 1.5s ease; }
+        .service-row:hover .service-img { transform: scale(1.05); }
+        .service-text { flex: 1; padding: 20px; }
+        .service-text h3 { font-size: 2rem; margin-bottom: 20px; }
+        .service-text p { line-height: 1.8; color: #666; font-size: 1.1rem; }
+
+        /* PARALLAX QUOTE */
+        .parallax-quote {
+            height: 60vh;
+            background: fixed center/cover url('https://images.unsplash.com/photo-1519225497282-c41ba0e84988?auto=format&fit=crop&q=80&w=2000');
+            display: flex; align-items: center; justify-content: center; text-align: center; color: white;
+            position: relative;
+        }
+        .parallax-quote::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.5); }
+        .quote-content { position: relative; z-index: 1; max-width: 800px; padding: 0 20px; }
+        .quote-content h2 { font-size: 2.2rem; font-style: italic; font-family: 'Tenor Sans'; }
+
+        /* GALLERY */
+        .gallery-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; }
+        .gallery-item { position: relative; overflow: hidden; border-radius: 4px; height: 400px; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: 1.2s cubic-bezier(0.16, 1, 0.3, 1); }
+        .gallery-item:hover img { transform: scale(1.1); filter: brightness(0.8); }
+        .gi-1 { grid-column: span 4; }
+        .gi-2 { grid-column: span 8; }
+        .gi-3 { grid-column: span 7; }
+        .gi-4 { grid-column: span 5; }
+
+        /* HORIZONTAL SCROLL */
+        .horizontal-gallery {
+            background: var(--dark);
+            padding: 140px 0;
+            overflow: hidden;
+        }
+        .horizontal-scroll-wrapper {
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(197, 160, 89, 0.6) transparent;
+            padding: 40px 0 40px 10%;
+            scroll-behavior: smooth;
+        }
+        .horizontal-scroll-wrapper::-webkit-scrollbar { height: 8px; }
+        .horizontal-scroll-wrapper::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+        .horizontal-scroll-wrapper::-webkit-scrollbar-thumb { background: rgba(197, 160, 89, 0.6); border-radius: 4px; }
+        .horizontal-scroll-wrapper::-webkit-scrollbar-thumb:hover { background: rgba(197, 160, 89, 0.9); }
+        
+        .horizontal-scroll-container { display: flex; gap: 30px; width: max-content; padding-right: 10%; }
+        .scroll-item { width: 500px; height: 600px; flex-shrink: 0; overflow: hidden; border-radius: 4px; position: relative; cursor: pointer; }
+        .scroll-item img { width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); display: block; }
+        .scroll-item:hover img { transform: scale(1.08); }
+        
+        .scroll-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 30px; background: linear-gradient(transparent, rgba(0,0,0,0.85)); color: white; transform: translateY(100%); transition: transform 0.5s ease; z-index: 5; }
+        .scroll-item:hover .scroll-overlay { transform: translateY(0); }
+
+        /* VENUES */
+        .venue-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .venue-card { position: relative; height: 450px; overflow: hidden; border-radius: 4px; cursor: pointer; }
+        .venue-image { width: 100%; height: 100%; background-size: cover; background-position: center; transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1); }
+        .venue-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 40px 30px; background: linear-gradient(transparent, rgba(0,0,0,0.9)); color: white; transform: translateY(20px); opacity: 0; transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .venue-card:hover .venue-overlay { transform: translateY(0); opacity: 1; }
+        .venue-card:hover .venue-image { transform: scale(1.1); }
+        .venue-overlay h3 { font-size: 1.5rem; margin-bottom: 8px; }
+        .venue-overlay p { font-size: 0.9rem; opacity: 0.8; }
+
+        /* FEATURED PROJECTS */
+        .featured-grid { display: flex; flex-direction: column; gap: 100px; }
+        .featured-item { display: grid; grid-template-columns: 1.2fr 1fr; gap: 60px; align-items: center; }
+        .featured-item:nth-child(even) { grid-template-columns: 1fr 1.2fr; }
+        .featured-item:nth-child(even) .featured-info { order: -1; }
+        .featured-item img { width: 100%; height: 500px; object-fit: cover; border-radius: 4px; }
+        .featured-category { color: var(--gold); font-size: 0.75rem; letter-spacing: 3px; font-weight: 600; }
+        .featured-info h3 { font-size: 2.2rem; margin: 15px 0 20px; }
+        .featured-info p { color: #666; font-size: 1.1rem; line-height: 1.8; }
+
+        /* AWARDS */
+        .awards-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; max-width: 1000px; margin: 0 auto; }
+        .award-item { text-align: center; padding: 40px 20px; background: white; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: transform 0.3s ease; }
+        .award-item:hover { transform: translateY(-10px); }
+        .award-icon { font-size: 3rem; color: var(--gold); margin-bottom: 20px; }
+        .award-item h4 { font-size: 1.1rem; margin-bottom: 10px; }
+        .award-item p { font-size: 0.85rem; color: #666; }
+
+        /* MASONRY GALLERY */
+        .masonry-gallery { column-count: 3; column-gap: 20px; }
+        .masonry-item { break-inside: avoid; margin-bottom: 20px; overflow: hidden; border-radius: 4px; }
+        .masonry-item img { width: 100%; display: block; transition: transform 0.6s ease; }
+        .masonry-item:hover img { transform: scale(1.05); }
+
+        /* TESTIMONIALS */
+        #testimonials { background: var(--cream); }
+        .testimonial-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 30px; padding-bottom: 40px; scrollbar-width: none; }
+        .testimonial-card { min-width: 400px; background: white; padding: 50px; scroll-snap-align: start; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
+        .stars { color: var(--gold); margin-bottom: 15px; }
+
+        /* TEAM */
+        .team-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 50px; max-width: 1200px; margin: 0 auto; }
+        .team-member { text-align: center; }
+        .team-photo { width: 100%; height: 400px; background-size: cover; background-position: center; margin-bottom: 25px; border-radius: 4px; filter: grayscale(100%); transition: all 0.6s ease; }
+        .team-member:hover .team-photo { filter: grayscale(0%); transform: translateY(-10px); }
+        .team-member h3 { font-size: 1.3rem; margin-bottom: 8px; }
+        .team-role { color: var(--gold); font-size: 0.85rem; letter-spacing: 2px; margin-bottom: 15px; font-weight: 600; }
+        .team-bio { color: #666; font-size: 0.95rem; line-height: 1.6; }
+
+        /* STATS */
+        .stats-bar { background: var(--dark); color: white; display: flex; flex-wrap: wrap; justify-content: space-around; padding: 80px 5%; text-align: center; }
+        .stat-item { padding: 20px; }
+        .stat-item h2 { font-size: 3.5rem; color: var(--gold); margin-bottom: 10px; }
+
+        /* CONTACT */
+        #contact { background: var(--white); }
+        .contact-container { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1.2fr; gap: 80px; }
+        input, textarea, select { width: 100%; padding: 20px 0; margin-bottom: 30px; border: none; border-bottom: 1px solid #ddd; background: transparent; font-family: inherit; font-size: 1rem; outline: none; transition: 0.3s; }
+        input:focus, textarea:focus, select:focus { border-bottom-color: var(--gold); }
+        
+        /* FOOTER */
+        footer { background: var(--dark); color: white; padding: 100px 8% 50px; text-align: center; }
+        .footer-logo { font-size: 2.5rem; color: var(--gold); margin-bottom: 30px; }
+        .social-links { margin: 30px 0; display: flex; justify-content: center; gap: 30px; }
+        .social-links a { color: white; text-decoration: none; font-size: 0.8rem; letter-spacing: 2px; transition: 0.3s; }
+        .social-links a:hover { color: var(--gold); }
+
+        /* MOBILE RESPONSIVE */
+        @media (max-width: 992px) {
+            nav { padding: 25px 4%; }
+            .nav-links {
+                position: fixed; right: -100%; top: 0; height: 100vh; width: 100%;
+                background: var(--white); flex-direction: column; justify-content: center;
+                transition: 0.5s cubic-bezier(0.77,0.2,0.05,1); z-index: 2050;
+            }
+            .nav-links.active { right: 0; }
+            .nav-links li { margin: 25px 0; }
+            .nav-links a { font-size: 1.5rem; }
+            .burger { display: flex; z-index: 2100; }
+        }
+
+        @media (max-width: 768px) {
+            body { overflow-x: hidden; width: 100%; }
+            
+            section { 
+                padding: 80px 5%; 
+                overflow: hidden; 
+                width: 100%;
+                margin: 0;
+            }
+            
+            .service-row, .service-row:nth-child(even) { 
+                flex-direction: column; 
+                gap: 30px;
+                width: 100%;
+            }
+            .service-img-wrapper { 
+                height: 350px;
+                width: 100%;
+            }
+            .service-text {
+                width: 100%;
+            }
+            
+            .contact-container { 
+                grid-template-columns: 1fr; 
+                gap: 40px;
+                width: 100%;
+            }
+            
+            .gallery-grid { 
+                display: flex; 
+                flex-direction: column;
+                width: 100%;
+            }
+            .gallery-item { 
+                height: 300px;
+                width: 100%;
+            }
+            
+            .scroll-item { 
+                width: 85vw; 
+                height: 450px;
+                flex-shrink: 0;
+            }
+            .horizontal-scroll-wrapper { 
+                padding: 40px 0 40px 7.5%;
+                overflow-x: auto;
+                overflow-y: hidden;
+                width: 100%;
+                -webkit-overflow-scrolling: touch;
+            }
+            .horizontal-scroll-container { 
+                padding-right: 7.5%;
+                gap: 20px;
+                width: max-content;
+            }
+            .scroll-overlay { 
+                transform: translateY(0); 
+                opacity: 1; 
+                background: linear-gradient(transparent, rgba(0,0,0,0.9)); 
+            }
+            
+            .venue-grid { 
+                grid-template-columns: 1fr;
+                width: 100%;
+            }
+            .venue-card {
+                width: 100%;
+            }
+            
+            .featured-item, .featured-item:nth-child(even) { 
+                grid-template-columns: 1fr; 
+                gap: 30px;
+                width: 100%;
+            }
+            .featured-item:nth-child(even) .featured-info { order: 0; }
+            .featured-item img { 
+                height: 350px; 
+                width: 100%;
+            }
+            
+            .team-container { 
+                grid-template-columns: 1fr; 
+                gap: 60px;
+                width: 100%;
+            }
+            .team-member {
+                width: 100%;
+            }
+            .team-photo { 
+                height: 350px;
+                width: 100%;
+            }
+            
+            .section-title { 
+                font-size: 2rem; 
+                margin-bottom: 50px;
+                width: 100%;
+            }
+            
+            .masonry-gallery { 
+                column-count: 1;
+                width: 100%;
+            }
+            .masonry-item {
+                width: 100%;
+            }
+            
+            .testimonial-card { 
+                min-width: 85vw;
+                width: 85vw;
+                padding: 30px;
+                flex-shrink: 0;
+            }
+            
+            .hero-arrow { display: none; }
+            .hero-controls { bottom: 20px; }
+            .hero-slide::before { background: rgba(18, 18, 18, 0.7); }
+            
+            .horizontal-gallery { 
+                padding: 100px 0; 
+                overflow: hidden;
+                width: 100%;
+            }
+            .horizontal-gallery > div:first-child { 
+                padding: 0 5%; 
+                margin-bottom: 40px;
+                width: 100%;
+            }
+            
+            .parallax-quote { 
+                height: 50vh;
+                width: 100%;
+            }
+            
+            .quote-content { 
+                padding: 0 5%;
+                width: 100%;
+            }
+            .quote-content h2 { font-size: 1.5rem; }
+            
+            .stats-bar { 
+                flex-direction: column; 
+                padding: 60px 5%; 
+                gap: 40px;
+                width: 100%;
+            }
+            .stat-item { 
+                padding: 0;
+                width: 100%;
+            }
+            
+            footer { 
+                padding: 60px 5% 30px;
+                width: 100%;
+            }
+            
+            input, textarea, select { 
+                padding: 15px 0;
+                width: 100%;
+            }
+
+            .hero-slider {
+                width: 100%;
+                overflow: hidden;
+            }
+
+            nav {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            nav { padding: 20px 3%; width: 100%; }
+            section { 
+                padding: 60px 4%; 
+                width: 100%;
+                overflow: hidden;
+            }
+            
+            .service-text h3 { font-size: 1.5rem; }
+            .service-text p { font-size: 1rem; }
+            
+            .section-title { 
+                font-size: 1.5rem; 
+                margin-bottom: 40px;
+                width: 100%;
+            }
+            .section-tag { font-size: 0.65rem; }
+            
+            .hero-slide h1 { font-size: clamp(2rem, 8vw, 3.5rem); }
+            
+            .scroll-item { 
+                width: 90vw;
+                height: 350px;
+                flex-shrink: 0;
+            }
+            .horizontal-scroll-wrapper {
+                width: 100%;
+                padding-left: 5%;
+            }
+            
+            .featured-item img { 
+                height: 250px;
+                width: 100%;
+            }
+            
+            .team-photo { 
+                height: 300px;
+                width: 100%;
+            }
+            
+            .testimonial-card { 
+                min-width: 90vw;
+                width: 90vw;
+                padding: 20px;
+                flex-shrink: 0;
+            }
+            
+            .award-item { 
+                padding: 25px 15px;
+                width: 100%;
+            }
+            .award-icon { font-size: 2rem; }
+            
+            .contact-container { 
+                gap: 30px;
+                width: 100%;
+            }
+            
+            #contact h2 { font-size: 1.8rem; }
+            
+            .parallax-quote { 
+                height: 45vh;
+                width: 100%;
+            }
+            .quote-content h2 { font-size: 1.2rem; }
+            
+            footer { 
+                padding: 40px 4% 20px;
+                width: 100%;
+            }
+            .footer-logo { font-size: 1.8rem; }
+
+            .gallery-item {
+                width: 100%;
+            }
+
+            .venue-card {
+                width: 100%;
+            }
+        }
+
+        .logo-text {
+            font-family: inherit;
+            text-transform: none;
+            letter-spacing: 0;
+            font-weight: 400;
+        }
+
+        .logo-img {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="#hero" class="logo-text">
+            <img src="logo.jpg" alt="Tessallure" class="logo-img">
+        </a>
+        <ul class="nav-links">
+            <li><a href="#hero">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#gallery">Portfolio</a></li>
+            <li><a href="#venues">Venues</a></li>
+            <li><a href="#awards">Awards</a></li>
+            <li><a href="#team">Team</a></li>
+            <li><a href="#testimonials">Clients</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <div class="burger" onclick="toggleMenu()">
+            <div class="line1"></div><div class="line2"></div><div class="line3"></div>
+        </div>
+    </nav>
+
+    <header class="hero-slider" id="hero">
+        <div class="hero-slide active" style="background-image: url('hero-1.jpg')">
+            <div class="hero-slide-content">
+                <h1>TESSALLURE</h1>
+                <p>Where Vision Meets Exquisite Execution</p>
+                <p style="font-size: clamp(0.8rem, 1.5vw, 0.95rem); margin-bottom: 40px; opacity: 0.9;">LONDON • NEW YORK • DUBAI</p>
+                <a href="#contact" class="btn-gold">Plan Your Event</a>
+            </div>
+        </div>
+
+        <div class="hero-slide" style="background-image: url('hero-2.jpg')">
+            <div class="hero-slide-content">
+                <h1>DESTINATION WEDDINGS</h1>
+                <p>Multi-Day Celebrations Across the Globe</p>
+                <p style="font-size: clamp(0.8rem, 1.5vw, 0.95rem); margin-bottom: 40px; opacity: 0.9;">From Amalfi to Santorini • Bespoke & Unforgettable</p>
+                <a href="#services" class="btn-gold">Explore Services</a>
+            </div>
+        </div>
+
+        <div class="hero-slide" style="background-image: url('hero-3.jpg')">
+            <div class="hero-slide-content">
+                <h1>LUXURY EXPERIENCES</h1>
+                <p>Corporate Galas & Private Celebrations</p>
+                <p style="font-size: clamp(0.8rem, 2vw, 1.1rem); margin-bottom: 40px; opacity: 0.9;">Immersive Design • Seamless Execution • Unforgettable Moments</p>
+                <a href="#contact" class="btn-gold">Start Your Journey</a>
+            </div>
+        </div>
+
+        <button class="hero-arrow prev" onclick="previousSlide()">&#10094;</button>
+        <button class="hero-arrow next" onclick="nextSlide()">&#10095;</button>
+        
+        <div class="hero-controls">
+            <span class="hero-dot active" onclick="goToSlide(0)"></span>
+            <span class="hero-dot" onclick="goToSlide(1)"></span>
+            <span class="hero-dot" onclick="goToSlide(2)"></span>
+        </div>
+    </header>
+
+    <section id="about">
+        <span class="section-tag reveal">OUR PHILOSOPHY</span>
+        <h2 class="section-title reveal">Where Vision Meets <br>Exquisite Execution</h2>
+        <div style="max-width: 800px; margin: 0 auto; text-align: center;" class="reveal">
+            <p style="line-height: 2; color: #555; font-size: 1.1rem;">Tessallure is a global boutique event house dedicated to those who seek the extraordinary. We don't just plan events; we architect atmosphere. Every detail is curated with obsession for excellence.</p>
+        </div>
+    </section>
+
+    <div class="parallax-quote">
+        <div class="quote-content reveal">
+            <h2>"Details are not the details. They make the design."</h2>
+            <p style="margin-top: 20px; letter-spacing: 3px; font-size: 0.9rem;">— CHARLES EAMES</p>
+        </div>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item reveal"><h2 data-target="250">0</h2><p>LUXURY EVENTS</p></div>
+        <div class="stat-item reveal"><h2 data-target="15">0</h2><p>GLOBAL AWARDS</p></div>
+        <div class="stat-item reveal"><h2 data-target="100">0</h2><p>EXCELLENCE RATE</p></div>
+        <div class="stat-item reveal"><h2 data-target="12">0</h2><p>COUNTRIES</p></div>
+    </div>
+
+    <section id="services">
+        <span class="section-tag reveal">EXPERTISE</span>
+        <h2 class="section-title reveal">Tailored Curations</h2>
+        
+        <div class="service-row">
+            <div class="service-img-wrapper reveal-left">
+                <div class="service-img" style="background-image: url('bridal-1.jpg')"></div>
+            </div>
+            <div class="service-text reveal-right">
+                <h3>Bridal Artistry</h3>
+                <p>We specialize in multi-day destination weddings, blending cultural heritage with contemporary sophistication. From private islands to historic palazzos, your love story deserves a grand stage.</p>
+                <a href="#contact" style="color: var(--gold); text-decoration: none; margin-top: 20px; display: inline-block; font-weight: 600;">LEARN MORE &rarr;</a>
+            </div>
+        </div>
+
+        <div class="service-row">
+            <div class="service-img-wrapper reveal-right">
+                <div class="service-img" style="background-image: url('expertise-1.jpg')"></div>
+            </div>
+            <div class="service-text reveal-left">
+                <h3>Corporate Galas</h3>
+                <p>Elevate your brand with high-impact product launches and immersive galas. We translate your corporate identity into a sensory experience that resonates with your stakeholders.</p>
+                <a href="#contact" style="color: var(--gold); text-decoration: none; margin-top: 20px; display: inline-block; font-weight: 600;">LEARN MORE &rarr;</a>
+            </div>
+        </div>
+
+        <div class="service-row">
+            <div class="service-img-wrapper reveal-left">
+                <div class="service-img" style="background-image: url('expertise-3.jpg')"></div>
+            </div>
+            <div class="service-text reveal-right">
+                <h3>Private Celebrations</h3>
+                <p>Milestone birthdays, anniversaries, and intimate gatherings deserve meticulous attention. We create bespoke experiences that honor your personal story and legacy.</p>
+                <a href="#contact" style="color: var(--gold); text-decoration: none; margin-top: 20px; display: inline-block; font-weight: 600;">LEARN MORE &rarr;</a>
+            </div>
+        </div>
+    </section>
+
+    <div class="horizontal-gallery">
+        <div style="padding: 0 10%;">
+            <span class="section-tag reveal" style="color: var(--gold);">SIGNATURE MOMENTS</span>
+            <h2 class="section-title reveal" style="color: white;">Captured Excellence</h2>
+        </div>
+        <div class="horizontal-scroll-wrapper">
+            <div class="horizontal-scroll-container">
+                <div class="scroll-item">
+                    <img src="captured-1.jpg" alt="Event">
+                    <div class="scroll-overlay"><h4>VENETIAN MASQUERADE</h4><p>150 guests • Palazzo Contarini</p></div>
+                </div>
+                <div class="scroll-item">
+                    <img src="captured-2.jpg" alt="Wedding">
+                    <div class="scroll-overlay"><h4>GARDEN ROMANCE</h4><p>Intimate • Cotswolds Estate</p></div>
+                </div>
+                <div class="scroll-item">
+                    <img src="captured-3.jpg" alt="Gala">
+                    <div class="scroll-overlay"><h4>TECH SUMMIT GALA</h4><p>500 guests • Dubai Marina</p></div>
+                </div>
+                <div class="scroll-item">
+                    <img src="captured-4.jpg" alt="Ceremony">
+                    <div class="scroll-overlay"><h4>CLIFFSIDE CEREMONY</h4><p>Santorini • Greece</p></div>
+                </div>
+                <div class="scroll-item">
+                    <img src="captured-5.jpg" alt="Launch">
+                    <div class="scroll-overlay"><h4>LUXURY BRAND LAUNCH</h4><p>Paris Fashion Week</p></div>
+                </div>
+                <div class="scroll-item">
+                    <img src="captured-6.jpg" alt="Reception">
+                    <div class="scroll-overlay"><h4>GOLDEN ANNIVERSARY</h4><p>London • The Savoy</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section id="gallery">
+        <span class="section-tag reveal">PORTFOLIO</span>
+        <h2 class="section-title reveal">The Collection</h2>
+        <div class="gallery-grid">
+            <div class="gallery-item gi-1 reveal"><img src="portfolio-1.jpg"></div>
+            <div class="gallery-item gi-2 reveal"><img src="portfolio-2.jpg"></div>
+            <div class="gallery-item gi-3 reveal"><img src="portfolio-3.jpg"></div>
+            <div class="gallery-item gi-4 reveal"><img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&q=60&w=800"></div>
+        </div>
+    </section>
+
+    <section id="venues">
+        <span class="section-tag reveal">GLOBAL REACH</span>
+        <h2 class="section-title reveal">Exclusive Venues</h2>
+        <p class="reveal" style="text-align: center; max-width: 700px; margin: -40px auto 80px; color: #666; font-size: 1.1rem;">Access to the world's most prestigious locations through our curated network of venue partnerships.</p>
+        
+        <div class="venue-grid">
+            <div class="venue-card reveal">
+                <div class="venue-image" style="background-image: url('venue-1.jpg')"></div>
+                <div class="venue-overlay"><h3>HISTORIC ESTATES</h3><p>European Châteaux & Palazzos</p></div>
+            </div>
+            <div class="venue-card reveal">
+                <div class="venue-image" style="background-image: url('venu-2.jpg')"></div>
+                <div class="venue-overlay"><h3>PRIVATE ISLANDS</h3><p>Caribbean & Mediterranean</p></div>
+            </div>
+            <div class="venue-card reveal">
+                <div class="venue-image" style="background-image: url('venu-3.jpg')"></div>
+                <div class="venue-overlay"><h3>LUXURY HOTELS</h3><p>Five-Star Global Properties</p></div>
+            </div>
+            <div class="venue-card reveal">
+                <div class="venue-image" style="background-image: url('venu-4.jpg')"></div>
+                <div class="venue-overlay"><h3>MODERN SPACES</h3><p>Galleries & Rooftop Venues</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="featured" style="background: #f9f9f9;">
+        <span class="section-tag reveal">FEATURED WORK</span>
+        <h2 class="section-title reveal">Recent Celebrations</h2>
+        
+        <div class="featured-grid">
+            <div class="featured-item">
+                <img src="recent-1.jpg" alt="Wedding" class="reveal-left">
+                <div class="featured-info reveal-right">
+                    <span class="featured-category">DESTINATION WEDDING</span>
+                    <h3>Amalfi Coast Romance</h3>
+                    <p>A three-day celebration overlooking the Mediterranean, where every detail told the couple's unique love story.</p>
+                </div>
+            </div>
+            <div class="featured-item">
+                <img src="recent-2.jpg" alt="Gala" class="reveal-right">
+                <div class="featured-info reveal-left">
+                    <span class="featured-category">CORPORATE GALA</span>
+                    <h3>Honey Moon Romance</h3>
+                    <p>500 guests experienced a futuristic design concept with interactive installations and immersive brand experience.</p>
+                </div>
+            </div>
+            <div class="featured-item">
+                <img src="recent-3.jpg" alt="Private" class="reveal-left">
+                <div class="featured-info reveal-right">
+                    <span class="featured-category">PRIVATE CELEBRATION</span>
+                    <h3>Golden Anniversary</h3>
+                    <p>An intimate garden affair for 150 guests, celebrating 50 years of love with botanical elegance and live music.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="awards">
+        <span class="section-tag reveal">RECOGNITION</span>
+        <h2 class="section-title reveal">Awards & Accolades</h2>
+        <div class="awards-container">
+            <div class="award-item reveal">
+                <div class="award-icon">★</div>
+                <h4>LUXURY EVENT PLANNER OF THE YEAR</h4>
+                <p>Event Industry Awards 2025</p>
+            </div>
+            <div class="award-item reveal">
+                <div class="award-icon">♔</div>
+                <h4>BEST DESTINATION WEDDING</h4>
+                <p>International Wedding Awards 2024</p>
+            </div>
+            <div class="award-item reveal">
+                <div class="award-icon">◆</div>
+                <h4>INNOVATION IN DESIGN</h4>
+                <p>Global Event Excellence 2025</p>
+            </div>
+            <div class="award-item reveal">
+                <div class="award-icon">✦</div>
+                <h4>TOP 10 LUXURY PLANNERS</h4>
+                <p>Vogue Business 2024</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="moments" style="background: var(--cream);">
+        <span class="section-tag reveal">MEMORIES</span>
+        <h2 class="section-title reveal">Unforgettable Moments</h2>
+        <div class="masonry-gallery">
+            <div class="masonry-item reveal"><img src="moment-1.jpg" alt="Event 1"></div>
+            <div class="masonry-item reveal"><img src="moment-2.jpg" alt="Event 2"></div>
+            <div class="masonry-item reveal"><img src="moment-3.jpg" alt="Event 3"></div>
+            <div class="masonry-item reveal"><img src="moment-4.jpg" alt="Event 4"></div>
+            <div class="masonry-item reveal"><img src="moment-5.jpg" alt="Event 5"></div>
+            <div class="masonry-item reveal"><img src="moment-6.jpg" alt="Event 6"></div>
+        </div>
+    </section>
+
+    <section id="team">
+        <span class="section-tag reveal">THE ARTISANS</span>
+        <h2 class="section-title reveal">Meet Our Team</h2>
+        <div class="team-container">
+            <div class="team-member reveal">
+                <div class="team-photo" style="background-image: url('ceo-pic.jpg')"></div>
+                <h3>TITILOPE OLATUNJI</h3>
+                <p class="team-role">Creative Director</p>
+                <p class="team-bio">15 years crafting unforgettable experiences across three continents. Former artistic director for haute couture.</p>
+            </div>
+            <div class="team-member reveal">
+                <div class="team-photo" style="background-image: url('https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=600')"></div>
+                <h3>MARCUS CHEN</h3>
+                <p class="team-role">Production Lead</p>
+                <p class="team-bio">Former theater director bringing cinematic precision to events. Master of logistics and seamless execution.</p>
+            </div>
+            <div class="team-member reveal">
+                <div class="team-photo" style="background-image: url('https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=600')"></div>
+                <h3>ISABELLA ROSSI</h3>
+                <p class="team-role">Design Curator</p>
+                <p class="team-bio">Former Vogue editor with eye for timeless elegance and ability to spot emerging trends.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="testimonials">
+        <span class="section-tag reveal">KIND WORDS</span>
+        <h2 class="section-title reveal">Client Experiences</h2>
+        <div class="testimonial-container">
+            <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p>"Tessallure turned our wedding into a dream. Their attention to detail was breathtaking."</p>
+                <h4 style="margin-top: 25px;">— ELEANOR & JAMES</h4>
+                <small>Lake Como, Italy</small>
+            </div>
+            <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p>"The most professional team we have worked with. Our product launch was the talk of the industry."</p>
+                <h4 style="margin-top: 25px;">— VOGUE GLOBAL</h4>
+                <small>New York City</small>
+            </div>
+            <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p>"Seamless, elegant, and stress-free. They handled everything while we enjoyed our celebration."</p>
+                <h4 style="margin-top: 25px;">— THE AL-SAYED FAMILY</h4>
+                <small>Dubai, UAE</small>
+            </div>
+            <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p>"Their ability to translate our brand into a physical experience was extraordinary."</p>
+                <h4 style="margin-top: 25px;">— LUXURY TECH CORP</h4>
+                <small>Dubai, UAE</small>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <div class="contact-container">
+            <div class="reveal-left">
+                <h2 style="font-size: 2.5rem;">Let's Create <br>Magic.</h2>
+                <p style="margin-top: 30px; font-size: 1.1rem; line-height: 1.8;">Ready to start your journey? We accept a limited number of commissions per year to ensure absolute dedication to every client.</p>
+                <div style="margin-top: 40px;">
+                    <p style="color: var(--gold); font-weight: 600; letter-spacing: 2px;">INQUIRIES</p>
+                    <p style="font-size: 1.2rem;">tessallureevents@gmail.com</p>
+                    <p style="margin-top: 20px; color: #666;">+234 81 8724 4442</p>
+                </div>
+            </div>
+            <form class="reveal-right" onsubmit="handleSubmit(event)">
+                <input type="text" placeholder="Your Name" required>
+                <input type="email" placeholder="Email Address" required>
+                <select required>
+                    <option value="" disabled selected>Event Type</option>
+                    <option>Bespoke Wedding</option>
+                    <option>Corporate Gala</option>
+                    <option>Private Celebration</option>
+                    <option>Other</option>
+                </select>
+                <input type="text" placeholder="Preferred Date">
+                <textarea rows="4" placeholder="Briefly describe your vision..." required></textarea>
+                <button type="submit" class="btn-gold" style="background: var(--dark); width: 100%; border: none; cursor: pointer;">Send Inquiry</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <h2 class="footer-logo">TESSALLURE</h2>
+        <p style="letter-spacing: 3px; font-size: 0.8rem;">THE STANDARD OF LUXURY EVENTS</p>
+        <div class="social-links">
+            <a href="#">INSTAGRAM</a>
+            <a href="#">PINTEREST</a>
+            <a href="#">LINKEDIN</a>
+            <a href="#">FACEBOOK</a>
+        </div>
+        <div style="margin-top: 60px; border-top: 1px solid #333; padding-top: 30px; font-size: 0.75rem; opacity: 0.6;">
+            <p>&copy; 2026 TESSALLURE PRIVATE EVENTS. ALL RIGHTS RESERVED.</p>
+            <p style="margin-top: 10px;">PRIVACY POLICY • TERMS & CONDITIONS</p>
+        </div>
+    </footer>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Navigation Menu Toggle
+        function toggleMenu() {
+            document.querySelector('.nav-links').classList.toggle('active');
+            document.querySelector('.burger').classList.toggle('toggle');
+        }
+
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.querySelector('.nav-links').classList.remove('active');
+                document.querySelector('.burger').classList.remove('toggle');
+            });
+        });
+
+        // Scroll Reveal Animation
+        const observerOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('active');
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => observer.observe(el));
+
+        // Parallax Effects
+        gsap.utils.toArray('.service-img').forEach(img => {
+            gsap.to(img, { yPercent: 20, ease: "none", scrollTrigger: { trigger: img, start: "top bottom", end: "bottom top", scrub: true } });
+        });
+
+        gsap.utils.toArray('.gallery-item img').forEach(img => {
+            gsap.to(img, { yPercent: -15, ease: "none", scrollTrigger: { trigger: img.parentElement, start: "top bottom", end: "bottom top", scrub: true } });
+        });
+
+        gsap.utils.toArray('.featured-item img').forEach(img => {
+            gsap.to(img, { scale: 1.1, ease: "none", scrollTrigger: { trigger: img, start: "top bottom", end: "bottom top", scrub: true } });
+        });
+
+        gsap.utils.toArray('.masonry-item img').forEach(img => {
+            gsap.to(img, { yPercent: -10, ease: "none", scrollTrigger: { trigger: img.parentElement, start: "top bottom", end: "bottom top", scrub: true } });
+        });
+
+        // Stats Counter Animation
+        const animateCounter = (element) => {
+            const target = parseInt(element.getAttribute('data-target'));
+            const duration = 2000;
+            const increment = target / (duration / 16);
+            let current = 0;
+            
+            const updateCounter = () => {
+                current += increment;
+                if (current < target) {
+                    element.textContent = Math.floor(current) + (target === 100 ? '' : '+');
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    element.textContent = target + (target === 100 ? '%' : '+');
+                }
+            };
+            updateCounter();
+        };
+
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counter = entry.target.querySelector('h2[data-target]');
+                    if (counter && !counter.classList.contains('counted')) {
+                        counter.classList.add('counted');
+                        animateCounter(counter);
+                    }
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.stat-item').forEach(item => statsObserver.observe(item));
+
+        // Horizontal Scroll (Desktop only)
+        if (window.innerWidth > 768) {
+            const horizontalSection = document.querySelector('.horizontal-scroll-container');
+            gsap.to(horizontalSection, {
+                x: () => -(horizontalSection.scrollWidth - window.innerWidth + (window.innerWidth * 0.1)),
+                ease: "none",
+                scrollTrigger: {
+                    trigger: '.horizontal-gallery',
+                    start: "top top",
+                    end: () => "+=" + (horizontalSection.scrollWidth - window.innerWidth),
+                    scrub: 1,
+                    pin: true,
+                    anticipatePin: 1
+                }
+            });
+        }
+
+        // Form Submission
+        function handleSubmit(e) {
+            e.preventDefault();
+            alert('Thank you for your inquiry! We will contact you within 24 hours.');
+            e.target.reset();
+        }
+
+        // Hero Slider
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.hero-slide');
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+                document.querySelector(`.hero-dot:nth-child(${i + 1})`).classList.toggle('active', i === index);
+            });
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        }
+
+        function previousSlide() {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(currentSlide);
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            showSlide(currentSlide);
+        }
+
+        setInterval(nextSlide, 8000);
+
+        // Smooth Scroll for Anchor Links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+    </script>
+</body>
+</html>
