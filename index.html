@@ -227,7 +227,9 @@
             -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
             scrollbar-color: rgba(197, 160, 89, 0.6) transparent;
-            padding: 40px 0 40px 10%;
+            padding: 40px 0 40px 5%;
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
             scroll-behavior: smooth;
         }
         .horizontal-scroll-wrapper::-webkit-scrollbar { height: 8px; }
@@ -235,7 +237,7 @@
         .horizontal-scroll-wrapper::-webkit-scrollbar-thumb { background: rgba(197, 160, 89, 0.6); border-radius: 4px; }
         .horizontal-scroll-wrapper::-webkit-scrollbar-thumb:hover { background: rgba(197, 160, 89, 0.9); }
         
-        .horizontal-scroll-container { display: flex; gap: 30px; width: max-content; padding-right: 10%; }
+        .horizontal-scroll-container { display: flex; gap: 30px; width: max-content; padding-right: 5%; }
         .scroll-item { width: 500px; height: 600px; flex-shrink: 0; overflow: hidden; border-radius: 4px; position: relative; cursor: pointer; }
         .scroll-item img { width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); display: block; }
         .scroll-item:hover img { transform: scale(1.08); }
@@ -369,14 +371,15 @@
                 flex-shrink: 0;
             }
             .horizontal-scroll-wrapper { 
-                padding: 40px 0 40px 7.5%;
+                padding: 40px 0 40px 5%;
                 overflow-x: auto;
                 overflow-y: hidden;
-                width: 100%;
+                width: 100vw;
+                margin-left: calc(-50vw + 50%);
                 -webkit-overflow-scrolling: touch;
             }
             .horizontal-scroll-container { 
-                padding-right: 7.5%;
+                padding-right: 5%;
                 gap: 20px;
                 width: max-content;
             }
@@ -497,10 +500,11 @@
         }
 
         @media (max-width: 480px) {
-            nav { padding: 20px 3%; width: 100%; }
+            nav { padding: 20px 3%; width: 100vw; margin-left: calc(-50vw + 50%); }
             section { 
                 padding: 60px 4%; 
-                width: 100%;
+                width: 100vw;
+                margin-left: calc(-50vw + 50%);
                 overflow: hidden;
             }
             
@@ -522,8 +526,9 @@
                 flex-shrink: 0;
             }
             .horizontal-scroll-wrapper {
-                width: 100%;
+                width: 100vw;
                 padding-left: 5%;
+                margin-left: calc(-50vw + 50%);
             }
             
             .featured-item img { 
@@ -588,6 +593,17 @@
             height: 50px;
             width: auto;
             object-fit: contain;
+        }
+
+        body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        html {
+            overflow-x: hidden;
+            width: 100%;
         }
     </style>
 </head>
