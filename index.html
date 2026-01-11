@@ -7,7 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    
+    <link rel="preconnect" href="https://images.unsplash.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
     <style>
         :root {
             --gold: #C5A059;
@@ -311,6 +313,54 @@
         .social-links { margin: 30px 0; display: flex; justify-content: center; gap: 30px; }
         .social-links a { color: white; text-decoration: none; font-size: 0.8rem; letter-spacing: 2px; transition: 0.3s; }
         .social-links a:hover { color: var(--gold); }
+
+        /* IMAGE OPTIMIZATION */
+        img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        img[data-src] {
+            opacity: 0;
+            transition: opacity 0.3s ease-in;
+        }
+
+        img.loaded {
+            opacity: 1;
+        }
+
+        /* PERFORMANCE */
+        .service-img, .gallery-item img, .masonry-item img {
+            will-change: auto;
+            contain: layout style paint;
+        }
+
+        .hero-slide {
+            will-change: opacity;
+        }
+
+        /* REDUCE ANIMATIONS ON MOBILE */
+        @media (max-width: 768px) {
+            .service-img, .gallery-item img, .featured-item img, .masonry-item img {
+                transform: none !important;
+                will-change: auto;
+            }
+            
+            /* Disable scroll animations on mobile */
+            .reveal, .reveal-left, .reveal-right {
+                animation: none;
+            }
+        }
+
+        /* PRELOAD CRITICAL IMAGES */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
 
         /* MOBILE RESPONSIVE */
         @media (max-width: 992px) {
@@ -630,7 +680,7 @@
     </nav>
 
     <header class="hero-slider" id="hero">
-        <div class="hero-slide active" style="background-image: url('hero-1.jpg')">
+        <div class="hero-slide active" data-bg="hero-1.jpg" style="background-size: cover;">
             <div class="hero-slide-content">
                 <h1>TESSALLURE</h1>
                 <p>Where Vision Meets Exquisite Execution</p>
@@ -639,7 +689,7 @@
             </div>
         </div>
 
-        <div class="hero-slide" style="background-image: url('hero-2.jpg')">
+        <div class="hero-slide" data-bg="hero-2.jpg" style="background-size: cover;">
             <div class="hero-slide-content">
                 <h1>DESTINATION WEDDINGS</h1>
                 <p>Multi-Day Celebrations Across the Globe</p>
@@ -648,7 +698,7 @@
             </div>
         </div>
 
-        <div class="hero-slide" style="background-image: url('hero-3.jpg')">
+        <div class="hero-slide" data-bg="hero-3.jpg" style="background-size: cover;">
             <div class="hero-slide-content">
                 <h1>LUXURY EXPERIENCES</h1>
                 <p>Corporate Galas & Private Celebrations</p>
@@ -766,10 +816,22 @@
         <span class="section-tag reveal">PORTFOLIO</span>
         <h2 class="section-title reveal">The Collection</h2>
         <div class="gallery-grid">
-            <div class="gallery-item gi-1 reveal"><img src="portfolio-1.jpg"></div>
-            <div class="gallery-item gi-2 reveal"><img src="portfolio-2.jpg"></div>
-            <div class="gallery-item gi-3 reveal"><img src="portfolio-3.jpg"></div>
-            <div class="gallery-item gi-4 reveal"><img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&q=60&w=800"></div>
+            <div class="gallery-item gi-1 reveal">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3C/svg%3E" 
+                     data-src="portfolio-1.jpg" loading="lazy" alt="Portfolio">
+            </div>
+            <div class="gallery-item gi-2 reveal">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3C/svg%3E" 
+                     data-src="portfolio-2.jpg" loading="lazy" alt="Portfolio">
+            </div>
+            <div class="gallery-item gi-3 reveal">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3C/svg%3E" 
+                     data-src="portfolio-3.jpg" loading="lazy" alt="Portfolio">
+            </div>
+            <div class="gallery-item gi-4 reveal">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3C/svg%3E" 
+                     data-src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&q=60&w=800" loading="lazy" alt="Portfolio">
+            </div>
         </div>
     </section>
 
@@ -1105,6 +1167,59 @@
                 if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
         });
+
+        // Lazy Load Images
+        const imageObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    if (img.dataset.src) {
+                        img.src = img.dataset.src;
+                        img.classList.add('loaded');
+                    }
+                    imageObserver.unobserve(img);
+                }
+            });
+        }, { rootMargin: '50px' });
+
+        document.querySelectorAll('img[data-src]').forEach(img => imageObserver.observe(img));
+
+        // Load background images
+        const bgObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target;
+                    if (el.dataset.bg) {
+                        el.style.backgroundImage = `url('${el.dataset.bg}')`;
+                    }
+                    bgObserver.unobserve(el);
+                }
+            });
+        }, { rootMargin: '100px' });
+
+        document.querySelectorAll('[data-bg]').forEach(el => bgObserver.observe(el));
+
+        // Disable parallax on mobile for better performance
+        if (window.innerWidth > 1024) {
+            gsap.utils.toArray('.service-img').forEach(img => {
+                gsap.to(img, { 
+                    yPercent: 20, 
+                    ease: "none", 
+                    scrollTrigger: { 
+                        trigger: img, 
+                        start: "top bottom", 
+                        end: "bottom top", 
+                        scrub: 1,
+                        onUpdate: (self) => { if(self.getVelocity() > 300) self.disable(); }
+                    } 
+                });
+            });
+        } else {
+            // Mobile: disable all parallax
+            document.querySelectorAll('.service-img, .gallery-item img, .masonry-item img, .featured-item img').forEach(el => {
+                el.style.transform = 'none';
+            });
+        }
     </script>
 </body>
 </html>
